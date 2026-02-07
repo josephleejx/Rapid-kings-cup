@@ -6,8 +6,6 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Rapid Kings">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#f0f2f5">
 
     <title>Rapid King's Cup</title>
@@ -19,48 +17,37 @@
             --header-h: 70px;
         }
 
-        /* --- THE TRIPLE-THREAT VIEWPORT LOCK --- */
+        /* --- THE ANTI-WHITE SYSTEM FLOOD --- */
         html { 
-            background-color: var(--bg); 
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            height: -webkit-fill-available;
-            height: 100dvh;
-            overflow: hidden; 
+            background-color: var(--bg) !important; 
+            margin: 0; padding: 0;
+            height: 100%; width: 100%;
+            overflow: hidden;
         }
 
         body {
-            position: fixed; 
-            inset: 0; 
-            width: 100vw; 
-            height: 100%;
-            height: -webkit-fill-available;
-            height: 100dvh;
-            margin: 0; 
-            padding: 0;
-            overflow: hidden; 
             background-color: var(--bg);
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: var(--text); 
-            display: flex; 
-            flex-direction: column;
-            overscroll-behavior: none; 
-            touch-action: manipulation; 
+            color: var(--text);
+            position: fixed; 
+            inset: 0;
+            /* Floods color behind the notch and home bar */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            box-sizing: border-box;
+            overscroll-behavior: none;
+            touch-action: none;
         }
 
-        /* --- Control Pane (Header) --- */
+        /* --- Header --- */
         #control-pane {
-            height: var(--header-h); 
-            width: 100%; 
-            background: white;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 0 15px; 
-            box-sizing: border-box;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-            z-index: 10;
+            height: var(--header-h); width: 100%; background: white;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; box-sizing: border-box;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10;
         }
 
         .header-title { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; line-height: 1; text-align: center; }
@@ -73,57 +60,54 @@
             justify-content: center; align-items: center; color: var(--text);
         }
 
-        /* --- Start Screen --- */
-        #overlay {
-            position: fixed; inset: 0;
-            background: linear-gradient(135deg, #ffffff 0%, #f1f2f6 100%);
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: center; z-index: 1000;
+        /* --- FULL SCREEN STRETCHED GRID --- */
+        #table-container { 
+            flex: 1;
+            width: 100%;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        #table { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(6, 1fr); 
+            gap: 8px; 
+            width: 100%; 
+            height: 100%; /* Stretching cards to fill vertical space */
+            max-width: 500px; 
+            align-items: stretch;
         }
 
-        .game-title-large {
-            font-size: 3rem; font-weight: 900; text-transform: uppercase;
-            text-align: center; line-height: 0.9; margin-bottom: 30px;
-        }
-        .game-title-large span { color: var(--accent); }
-
-        .btn-group { display: flex; flex-direction: column; gap: 15px; width: 220px; }
-
-        .start-btn {
-            padding: 18px 0; font-size: 20px; font-weight: bold;
-            background: var(--accent); color: white; border: none;
-            border-radius: 50px; box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
-        }
-
-        .how-btn {
-            padding: 12px 0; font-size: 14px; font-weight: bold;
-            background: transparent; color: var(--text);
-            border: 2px solid #ccc; border-radius: 50px;
-        }
-
-        /* --- Card Table --- */
-        #table-container { flex: 1; padding: 10px; box-sizing: border-box; display: flex; justify-content: center; align-items: center; }
-        #table { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, 1fr); gap: 6px; width: 100%; height: 100%; max-width: 450px; }
-
-        /* --- Card Design --- */
-        .card { perspective: 1000px; position: relative; }
+        .card { perspective: 1000px; position: relative; width: 100%; height: 100%; }
         .card-inner { position: absolute; inset: 0; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
         .card.flipped .card-inner { transform: rotateY(180deg); }
-        .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; border: 1px solid #ddd; }
+        .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; border: 1px solid #ddd; }
         .card-back { background-color: #e74c3c; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 8px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 8px); border: 2px solid white; }
         .card-front { transform: rotateY(180deg); font-family: 'serif'; }
-        .suit-large { font-size: 2.5vh; }
-        .rank-large { font-size: 3.5vh; font-weight: bold; }
+        
+        .suit-large { font-size: 3vh; }
+        .rank-large { font-size: 4vh; font-weight: bold; line-height: 1; }
         .red { color: #e63946; }
         .black { color: #2d3436; }
 
-        /* --- Modals --- */
+        /* --- Overlays & Modals --- */
+        #overlay { position: fixed; inset: 0; background: linear-gradient(135deg, #ffffff 0%, #f1f2f6 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
+        .game-title-large { font-size: 3rem; font-weight: 900; text-transform: uppercase; text-align: center; line-height: 0.9; margin-bottom: 30px; }
+        .game-title-large span { color: var(--accent); }
+        .btn-group { display: flex; flex-direction: column; gap: 15px; width: 220px; }
+        .start-btn { padding: 18px 0; font-size: 20px; font-weight: bold; background: var(--accent); color: white; border: none; border-radius: 50px; }
+        .how-btn { padding: 12px 0; font-size: 14px; font-weight: bold; background: transparent; color: var(--text); border: 2px solid #ccc; border-radius: 50px; }
+
         #modal, #pause-modal, #how-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 340px; background: white; padding: 30px 20px; border-radius: 20px; text-align: center; max-height: 80vh; overflow-y: auto; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 340px; background: white; padding: 30px 20px; border-radius: 20px; text-align: left; max-height: 85vh; overflow-y: auto; }
         
-        #modal-title, .modal-content h2 { color: var(--accent); margin-top: 0; font-size: 1.5rem; text-transform: uppercase; }
-        #modal-desc, .modal-content p { font-size: 1.05rem; color: #444; margin-bottom: 20px; text-align: left; line-height: 1.4; }
-        .primary-btn { background: var(--text); color: white; border: none; padding: 12px 35px; border-radius: 10px; font-weight: bold; }
+        /* Pro-tip spacing */
+        .pro-tip { display: block; margin: 30px 0; font-style: italic; color: #666; font-size: 0.95rem; border-left: 3px solid var(--accent); padding-left: 12px; }
+        .primary-btn { display: block; margin: 20px auto 0; background: var(--text); color: white; border: none; padding: 12px 35px; border-radius: 10px; font-weight: bold; }
 
         canvas { position: fixed; inset: 0; pointer-events: none; z-index: 2500; }
     </style>
@@ -147,49 +131,33 @@
         </div>
     </header>
 
-    <div id="table-container">
-        <div id="table"></div>
-    </div>
+    <div id="table-container"><div id="table"></div></div>
 
-    <div id="modal">
-        <div class="modal-content">
-            <h2 id="modal-title"></h2>
-            <p id="modal-desc"></p>
-            <button class="primary-btn" id="modal-close">OK</button>
-        </div>
-    </div>
+    <div id="modal"><div class="modal-content"><h2 id="modal-title" style="text-align: center;"></h2><p id="modal-desc"></p><button class="primary-btn" id="modal-close">OK</button></div></div>
 
     <div id="how-modal">
         <div class="modal-content">
-            <h2>THE SETUP 🍺</h2>
+            <h2 style="text-align: center;">THE SETUP 🍺</h2>
             <p>
-                <b>1. The Center Cup:</b> Place one empty cup—the bigger the better—in the middle of the table.<br><br>
-                <b>2. The Tokens:</b> Find 4 physical objects (bottle caps, coasters, or lighters). Place all 4 beside the phone before you start.<br>
-                <i>Pro-tip: Anything small that everyone remembers works as a token!</i><br><br>
+                <b>1. The King's Cup:</b> Place one empty cup—the bigger the better—in the middle of the table.<br><br>
+                <b>2. The Tokens:</b> Find 4 physical objects (bottle caps, coasters, lighters, anything...). Place all 4 beside the phone before you start.
+                <span class="pro-tip">Pro-tip: Anything small that everyone remembers works as a token!</span>
                 <b>3. The Circle:</b> Everyone sit in a circle with your own drinks ready.
             </p>
-            <h2>THE RULES 🃏</h2>
+            <h2 style="text-align: center;">THE RULES 🃏</h2>
             <p>
-                <b>The Goal:</b> There is no winner, only survivors. Have fun, keep the drinks flowing, and try not to be the one who finishes the Center Cup.<br><br>
+                <b>The Goal:</b> There is no winner, only survivors. Have fun, keep the drinks flowing, and try not to be the one who finishes the King's Cup.<br><br>
                 <b>The Flow:</b> Choose a starting player. Decide if you’re moving clockwise or counter-clockwise (keep it simple!).<br><br>
                 <b>The Turn:</b> On your turn, tap any card on the screen to flip it.<br><br>
                 <b>The Mystery:</b> Every card has a command. Some are gifts, some are traps. You’ll learn what they mean as you play.
             </p>
-            <h2>THE LEGEND OF THE KING 👑</h2>
-            <p>
-                The game builds tension with every King revealed. The player who draws the <b>4th and final King</b> must finish the entire Center Cup! That player then becomes the "Starter" for the next round.
-            </p>
+            <h2 style="text-align: center;">THE LEGEND 👑</h2>
+            <p>The player who draws the <b>4th King</b> must finish the entire King's Cup! That player then starts the next round.</p>
             <button class="primary-btn" id="close-how">GOT IT!</button>
         </div>
     </div>
 
-    <div id="pause-modal">
-        <div class="modal-content">
-            <h2>PAUSED</h2>
-            <p style="text-align: center;">Ready to jump back in?</p>
-            <button class="primary-btn" id="resume-btn">RESUME</button>
-        </div>
-    </div>
+    <div id="pause-modal"><div class="modal-content"><h2 style="text-align: center;">PAUSED</h2><button class="primary-btn" id="resume-btn">RESUME</button></div></div>
 
     <canvas id="confetti-canvas"></canvas>
 
@@ -197,14 +165,12 @@
     document.addEventListener('DOMContentLoaded', () => {
         const ranks = ['A', '9', '10', 'J', 'Q', 'K'];
         const suits = [{ s: '♠', c: 'black' }, { s: '♥', c: 'red' }, { s: '♣', c: 'black' }, { s: '♦', c: 'red' }];
-        let deck = [];
-        let kingsFound = 0;
+        const kingTitles = ["THE ONE TRUE KING", "ALL HAIL THE MAJESTY", "THE CHOSEN ONE", "KING OF KINGS", "THE ROYAL SACRIFICE", "THE CROWN’S BURDEN", "SOVEREIGN OF THE SIP", "HIS UNLUCKY HIGHNESS", "THE FINAL BOSS", "THE CUP’S DESTINY"];
+        
+        let deck = []; let kingsFound = 0;
 
         function createDeck() {
-            deck = [];
-            ranks.forEach(r => {
-                suits.forEach(s => deck.push({ rank: r, suit: s }));
-            });
+            deck = []; ranks.forEach(r => suits.forEach(s => deck.push({ rank: r, suit: s })));
         }
 
         function shuffle(array) {
@@ -214,60 +180,41 @@
             }
         }
 
-        function startGame() {
-            document.getElementById('overlay').style.display = 'none';
-            kingsFound = 0;
-            createDeck();
-            shuffle(deck);
-            renderTable();
-        }
-
         function renderTable() {
             const table = document.getElementById('table');
             table.innerHTML = '';
             deck.forEach((card, index) => {
                 const cardEl = document.createElement('div');
                 cardEl.className = 'card';
-                cardEl.innerHTML = `
-                    <div class="card-inner" id="card-${index}">
-                        <div class="card-face card-back"></div>
-                        <div class="card-face card-front ${card.suit.c}">
-                            <div class="rank-large">${card.rank}</div>
-                            <div class="suit-large">${card.suit.s}</div>
-                        </div>
-                    </div>
-                `;
-                cardEl.addEventListener('click', () => flipCard(index));
+                cardEl.innerHTML = `<div class="card-inner" id="card-${index}"><div class="card-face card-back"></div><div class="card-face card-front ${card.suit.c}"><div class="rank-large">${card.rank}</div><div class="suit-large">${card.suit.s}</div></div></div>`;
+                cardEl.onclick = () => {
+                    const el = document.getElementById(`card-${index}`);
+                    if (el.parentElement.classList.contains('flipped')) return;
+                    el.parentElement.classList.add('flipped');
+                    setTimeout(() => handleRule(deck[index]), 400);
+                };
                 table.appendChild(cardEl);
             });
         }
 
-        function flipCard(index) {
-            const cardInner = document.getElementById(`card-${index}`);
-            if (cardInner.parentElement.classList.contains('flipped')) return;
-            cardInner.parentElement.classList.add('flipped');
-            setTimeout(() => handleRule(deck[index]), 400);
-        }
-
         function handleRule(card) {
             let title = ""; let desc = ""; let isGameOver = false;
-
             if (card.rank === 'K') {
                 kingsFound++;
                 if (kingsFound < 4) {
                     title = `King's Tax #${kingsFound}`;
-                    desc = "The royal pot grows. Pour a portion of your drink into the Center Cup! 🍷";
+                    desc = "The royal pot grows. Pour any amount of drink into the King's Cup. Be generous—don't be a stingy monarch! 🍷";
                 } else {
-                    title = "THE FINAL BOSS";
-                    desc = "Heavy is the head that wears the crown. Drink the entire Center Cup! 👑";
+                    title = kingTitles[Math.floor(Math.random() * kingTitles.length)];
+                    desc = "Heavy is the head that wears the crown. Drink the entire King's Cup! 👑";
                     isGameOver = true;
                 }
             } else {
                 const pre = `${card.rank}: `;
                 switch(card.rank) {
-                    case 'A': title = pre + "THE ROYAL TOAST"; desc = "The crown commands a drink! Take a sip and carry on. 🥂"; break;
-                    case '9': title = pre + "THE THIEF"; desc = "Yoink! Steal a token from any player. If nobody has one, your heist was a bust. 🥷"; break;
-                    case '10': title = pre + "THE ASSASSIN"; desc = "Pick a target. They drink. You stay hydrated. It’s just business. 🎯"; break;
+                    case 'A': title = pre + "THE ROYAL TOAST"; desc = "The Crown commands a tribute! Take a sip and carry on. 🥂"; break;
+                    case '9': title = pre + "THE THIEF"; desc = "Yoink! Steal a Queen (token) from any player. No tokens available? Your heist was a bust. 🥷"; break;
+                    case '10': title = pre + "THE ASSASSIN"; desc = "Bang! Point your finger at a person. Your target drinks. It's just business. 🎯"; break;
                     case 'J': title = pre + "THE HERO"; desc = "U-turn! You just saved the next person from their fate. The order is now reversed! ↪️"; break;
                     case 'Q': title = pre + "THE SHIELD"; desc = "You found a shield! Grab a token. Use it before you draw on a future turn to skip your go. 🛡️"; break;
                 }
@@ -278,33 +225,29 @@
         function showModal(title, desc, isGameOver) {
             const modal = document.getElementById('modal');
             document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerHTML = desc;
+            document.getElementById('modal-desc').innerText = desc;
             const btn = document.getElementById('modal-close');
             if (isGameOver) {
-                btn.innerText = "PLAY AGAIN";
-                btn.onclick = () => location.reload();
-                startConfetti();
+                btn.innerText = "PLAY AGAIN"; btn.onclick = () => location.reload(); startConfetti();
             } else {
-                btn.innerText = "OK";
-                btn.onclick = () => modal.style.display = 'none';
+                btn.innerText = "OK"; btn.onclick = () => modal.style.display = 'none';
             }
             modal.style.display = 'block';
         }
 
-        document.getElementById('start-game').addEventListener('click', startGame);
-        document.getElementById('show-how').addEventListener('click', () => document.getElementById('how-modal').style.display = 'block');
-        document.getElementById('close-how').addEventListener('click', () => document.getElementById('how-modal').style.display = 'none');
-        document.getElementById('home-btn').addEventListener('click', () => { if(confirm("Return to home screen?")) location.reload(); });
-        document.getElementById('pause-btn').addEventListener('click', () => document.getElementById('pause-modal').style.display = 'block');
-        document.getElementById('resume-btn').addEventListener('click', () => document.getElementById('pause-modal').style.display = 'none');
-        document.getElementById('restart-btn').addEventListener('click', () => { if(confirm("Restart the deck?")) startGame(); });
+        document.getElementById('start-game').onclick = () => { document.getElementById('overlay').style.display = 'none'; kingsFound = 0; createDeck(); shuffle(deck); renderTable(); };
+        document.getElementById('show-how').onclick = () => document.getElementById('how-modal').style.display = 'block';
+        document.getElementById('close-how').onclick = () => document.getElementById('how-modal').style.display = 'none';
+        document.getElementById('home-btn').onclick = () => { if(confirm("Return to home?")) location.reload(); };
+        document.getElementById('pause-btn').onclick = () => document.getElementById('pause-modal').style.display = 'block';
+        document.getElementById('resume-btn').onclick = () => document.getElementById('pause-modal').style.display = 'none';
+        document.getElementById('restart-btn').onclick = () => { if(confirm("Restart the deck?")) { kingsFound = 0; createDeck(); shuffle(deck); renderTable(); } };
 
         function startConfetti() {
-            const canvas = document.getElementById('confetti-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            let particles = Array.from({length: 80}, () => ({ x: Math.random() * canvas.width, y: -10, r: Math.random() * 6 + 2, v: Math.random() * 2 + 2, c: `hsl(${Math.random() * 360}, 80%, 50%)` }));
-            function anim() { ctx.clearRect(0,0,canvas.width, canvas.height); particles.forEach(p => { p.y += p.v; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.r, p.r); if(p.y > canvas.height) p.y = -10; }); requestAnimationFrame(anim); }
+            const c = document.getElementById('confetti-canvas'); const ctx = c.getContext('2d');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+            let p = Array.from({length: 80}, () => ({ x: Math.random() * c.width, y: -10, r: Math.random() * 6 + 2, v: Math.random() * 2 + 2, c: `hsl(${Math.random() * 360}, 80%, 50%)` }));
+            function anim() { ctx.clearRect(0,0,c.width, c.height); p.forEach(p => { p.y += p.v; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.r, p.r); if(p.y > c.height) p.y = -10; }); requestAnimationFrame(anim); }
             anim();
         }
     });
