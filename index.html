@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rapid Kings">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>Rapid King's Cup</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --accent: #ff4757;
+            --text: #2f3542;
+            --header-h: 70px;
+        }
+
+        /* THE "ANTI-WHITE-BOX" LOCK */
+        html {
+            background-color: var(--bg);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        body {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            overscroll-behavior: none;
+            /* Prevents double-tap zoom which shifts layout */
+            touch-action: manipulation; 
+        }
+
+        /* --- Control Pane (Header) --- */
+        #control-pane {
+            height: var(--header-h);
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            padding-top: env(safe-area-inset-top); /* Supports phone notches */
+            box-sizing: border-box;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .header-title span { color: var(--accent); }
+
+        .controls { display: flex; gap: 10px; }
+
+        .icon-btn {
+            background: #f1f2f6;
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text);
+        }
+
+        /* --- Start Screen --- */
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f2f6 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-title-large {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 0.9;
+            margin-bottom: 40px;
+        }
+        .game-title-large span { color: var(--accent); }
+
+        .start-btn {
+            padding: 20px 60px;
+            font-size: 22px;
+            font-weight: bold;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+        }
+
+        /* --- Card Table --- */
+        #table-container {
+            flex: 1;
+            padding: 10px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #table {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+            max-width: 450px;
+        }
+
+        /* --- Card Design --- */
+        .card { perspective: 1000px; position: relative; }
+        .card-inner {
+            position: absolute; inset: 0;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+
+        .card-face {
+            position: absolute; inset: 0;
+            backface-visibility: hidden;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .card-back {
+            background-color: #e74c3c;
+            background-image: 
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 8px),
+                repeating-linear-gradient(-45deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 8px);
+            border: 2px solid white;
+        }
+
+        .card-front { transform: rotateY(180deg); font-family: 'serif'; }
+        .suit-large { font-size: 2.5vh; }
+        .rank-large { font-size: 3.5vh; font-weight: bold; }
+        .red { color: #e63946; }
+        .black { color: #2d3436; }
+
+        /* --- Modals --- */
+        #modal, #pause-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%; max-width: 320px;
+            background: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        #modal-title { color: var(--accent); margin-top: 0; font-size: 1.5rem; text-transform: uppercase; }
+        #modal-desc { font-size: 1.1rem; color: #444; margin-bottom: 25px; }
+
+        .primary-btn {
+            background: var(--text); color: white; border: none;
+            padding: 12px 35px; border-radius: 10px; font-weight: bold;
+        }
+
+        canvas { position: fixed; inset: 0; pointer-events: none; z-index: 2500; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay">
+        <div class="game-title-large">Rapid<br><span>King's Cup</span></div>
+        <button class="start-btn" id="start-game">START</button>
+    </div>
+
+    <header id="control-pane">
+        <div class="header-title">Rapid<br><span>King's Cup</span></div>
+        <div class="controls">
+            <button class="icon-btn" id="pause-btn">⏸</button>
+            <button class="icon-btn" id="restart-btn">↻</button>
+        </div>
+    </header>
+
+    <div id="table-container">
+        <div id="table"></div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h2 id="modal-title"></h2>
+            <p id="modal-desc"></p>
+            <button class="primary-btn" id="modal-close">OK</button>
+        </div>
+    </div>
+
+    <div id="pause-modal">
+        <div class="modal-content">
+            <h2>PAUSED</h2>
+            <p>Ready to jump back in?</p>
+            <button class="primary-btn" id="resume-btn">RESUME</button>
+        </div>
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ranks = ['A', '9', '10', 'J', 'Q', 'K'];
+        const suits = [
+            { s: '♠', c: 'black' }, { s: '♥', c: 'red' },
+            { s: '♣', c: 'black' }, { s: '♦', c: 'red' }
+        ];
+
+        let deck = [];
+        let kingsFound = 0;
+
+        function createDeck() {
+            deck = [];
+            ranks.forEach(r => {
+                suits.forEach(s => deck.push({ rank: r, suit: s }));
+            });
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startGame() {
+            document.getElementById('overlay').style.display = 'none';
+            kingsFound = 0;
+            createDeck();
+            shuffle(deck);
+            renderTable();
+        }
+
+        function renderTable() {
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            deck.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.innerHTML = `
+                    <div class="card-inner" id="card-${index}">
+                        <div class="card-face card-back"></div>
+                        <div class="card-face card-front ${card.suit.c}">
+                            <div class="rank-large">${card.rank}</div>
+                            <div class="suit-large">${card.suit.s}</div>
+                        </div>
+                    </div>
+                `;
+                cardEl.addEventListener('click', () => flipCard(index));
+                table.appendChild(cardEl);
+            });
+        }
+
+        function flipCard(index) {
+            const cardInner = document.getElementById(`card-${index}`);
+            if (cardInner.parentElement.classList.contains('flipped')) return;
+
+            cardInner.parentElement.classList.add('flipped');
+            setTimeout(() => handleRule(deck[index]), 400);
+        }
+
+        function handleRule(card) {
+            let title = "";
+            let desc = "";
+            let isGameOver = false;
+
+            if (card.rank === 'K') {
+                kingsFound++;
+                if (kingsFound < 4) {
+                    title = `King's Tax #${kingsFound}`;
+                    desc = "The royal pot grows. Pour a portion of your drink into the Center Cup! 🍷";
+                } else {
+                    title = "THE FINAL BOSS";
+                    desc = "Heavy is the head that wears the crown. Drink the entire Center Cup! 👑";
+                    isGameOver = true;
+                }
+            } else {
+                const prefix = `${card.rank}: `;
+                switch(card.rank) {
+                    case 'A':
+                        title = prefix + "THE ROYAL TOAST";
+                        desc = "The crown commands a drink! Take a sip and carry on. 🥂";
+                        break;
+                    case '9':
+                        title = prefix + "THE THIEF";
+                        desc = "Yoink! Steal a Shield (Queen) from any player. If nobody has one, your heist was a bust. 🥷";
+                        break;
+                    case '10':
+                        title = prefix + "THE ASSASSIN";
+                        desc = "Pick a target. They drink. You stay hydrated. It’s just business. 🎯";
+                        break;
+                    case 'J':
+                        title = prefix + "THE HERO";
+                        desc = "A total U-turn! You just saved the next person from their fate. The turn order is now reversed! ↪️";
+                        break;
+                    case 'Q':
+                        title = prefix + "THE SHIELD";
+                        desc = "You found a Shield! To use it, you must activate it before you draw on a future turn to skip your go entirely. 🛡️";
+                        break;
+                }
+            }
+            showModal(title, desc, isGameOver);
+        }
+
+        function showModal(title, desc, isGameOver) {
+            const modal = document.getElementById('modal');
+            const modalBtn = document.getElementById('modal-close');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            
+            if (isGameOver) {
+                modalBtn.innerText = "PLAY AGAIN";
+                modalBtn.onclick = () => location.reload();
+                startConfetti();
+            } else {
+                modalBtn.innerText = "OK";
+                modalBtn.onclick = () => modal.style.display = 'none';
+            }
+            modal.style.display = 'block';
+        }
+
+        // --- UI Handlers ---
+        document.getElementById('start-game').addEventListener('click', startGame);
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            document.getElementById('pause-modal').style.display = 'block';
+        });
+        document.getElementById('resume-btn').addEventListener('click', () => {
+            document.getElementById('pause-modal').style.display = 'none';
+        });
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            if (confirm("Reset the deck?")) startGame();
+        });
+
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particles = Array.from({length: 80}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                r: Math.random() * 6 + 2,
+                v: Math.random() * 2 + 2,
+                c: `hsl(${Math.random() * 360}, 80%, 50%)`
+            }));
+            function anim() {
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.v;
+                    ctx.fillStyle = p.c;
+                    ctx.fillRect(p.x, p.y, p.r, p.r);
+                    if(p.y > canvas.height) p.y = -10;
+                });
+                requestAnimationFrame(anim);
+            }
+            anim();
+        }
+    });
+    </script>
+</body>
+</html>
