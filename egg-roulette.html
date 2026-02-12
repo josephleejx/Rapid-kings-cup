@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Egg Roulette</title>
+    <style>
+        :root {
+            --bg: #1a102e; 
+            --accent: #f1c40f; 
+            --text: #ffffff;
+            --header-bg: #110921;
+            --header-h: 75px;
+            --card-back: #3d2b5e;
+            --overlay-bg: linear-gradient(135deg, #1a102e 0%, #2d1b4d 100%);
+        }
+
+        body.pair-active {
+            --bg: #0f2d21;
+            --header-bg: #071a13;
+            --card-back: #1b4d3e;
+            --accent: #00d2ff;
+            --overlay-bg: linear-gradient(135deg, #0f2d21 0%, #1b4d3e 100%);
+        }
+
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg); color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden; touch-action: none;
+        }
+
+        #main-wrapper { display: flex; flex-direction: column; width: 100%; height: 100%; position: relative; }
+
+        #control-pane {
+            height: var(--header-h); width: 100%; background: var(--header-bg);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; box-sizing: border-box;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 100;
+        }
+
+        .header-title { font-size: 0.9rem; font-weight: 900; text-transform: uppercase; text-align: center; flex: 1; pointer-events: none; }
+        .header-title span { color: var(--accent); display: block; font-size: 1.1rem; }
+
+        .header-side { width: 95px; display: flex; align-items: center; }
+        .header-side.right { justify-content: flex-end; gap: 8px; }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.1); border: none; width: 40px; height: 40px;
+            border-radius: 10px; font-size: 1.2rem; display: flex;
+            justify-content: center; align-items: center; color: white;
+            cursor: pointer;
+        }
+
+        #table-container { flex: 1; width: 100%; padding: 10px; box-sizing: border-box; overflow: hidden; }
+        #table { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; height: 100%; }
+
+        .egg { perspective: 1000px; position: relative; width: 100%; height: 100%; cursor: pointer; }
+        .egg-inner { position: absolute; inset: 0; transition: transform 0.5s; transform-style: preserve-3d; pointer-events: none; }
+        .egg.flipped .egg-inner { transform: rotateY(180deg); }
+        .egg-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 12px; display: flex; justify-content: center; align-items: center; background: var(--card-back); border: 2px solid rgba(255,255,255,0.1); font-size: 2.2rem; }
+        .egg-front { transform: rotateY(180deg); background: white; color: #2d3436; }
+        .egg-front.bad { color: #ff4757; }
+
+        #overlay { position: fixed; inset: 0; background: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .game-title-large { font-size: 3.5rem; font-weight: 900; text-transform: uppercase; text-align: center; color: var(--text); line-height: 0.9; }
+        .game-title-large span { color: var(--accent); }
+        
+        .grid-select-wrap { margin-top: 30px; text-align: center; width: 220px; }
+        .grid-select-label { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; display: block; }
+        .grid-options { display: flex; justify-content: space-between; gap: 10px; }
+        .grid-opt { flex: 1; padding: 12px 0; background: rgba(255,255,255,0.1); border: 2px solid transparent; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .grid-opt.active { border-color: var(--accent); color: var(--accent); background: rgba(0,0,0,0.2); }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; width: 220px; margin-top: 30px; }
+        .start-btn { padding: 18px 0; font-size: 20px; font-weight: bold; background: var(--accent); color: var(--btn-text); border: none; border-radius: 50px; cursor: pointer; }
+        .how-btn { padding: 12px 0; font-size: 14px; font-weight: bold; background: transparent; color: var(--text); border: 2px solid #555; border-radius: 50px; cursor: pointer; }
+
+        .mode-toggle-corner { position: absolute; bottom: 30px; right: 20px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .mode-label { font-weight: 900; font-size: 0.6rem; text-transform: uppercase; opacity: 0.7; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background-color: #3d2b5e; transition: .4s; border-radius: 34px; border: 1px solid rgba(255,255,255,0.1); }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; backdrop-filter: blur(4px); }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-width: 350px; background: white; padding: 30px 25px; border-radius: 25px; color: #2f3542; text-align: center; }
+        #modal-icon { font-size: 5rem; margin-bottom: 10px; display: block; }
+        #modal-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; color: #2f3542; }
+        #modal-desc { font-size: 1.1rem; line-height: 1.4; color: #4a4a4a; }
+        .primary-btn { display: block; margin: 25px auto 0; background: #2f3542; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 1rem; cursor: pointer; }
+        .chicken-out { display: block; margin-top: 15px; font-size: 0.8rem; color: #888; text-decoration: underline; cursor: pointer; background: none; border: none; width: 100%; }
+
+        canvas { position: fixed; inset: 0; pointer-events: none; z-index: 4000; opacity: 0; }
+    </style>
+</head>
+<body>
+
+<div id="main-wrapper">
+    <div id="overlay">
+        <div class="game-title-large">Egg<br><span>Roulette</span></div>
+        <div class="grid-select-wrap">
+            <span class="grid-select-label">Select Grid Size</span>
+            <div class="grid-options">
+                <button class="grid-opt active" data-size="16">16</button>
+                <button class="grid-opt" data-size="24">24</button>
+                <button class="grid-opt" data-size="32">32</button>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="start-btn" id="start-game">START GAME</button>
+            <button class="how-btn" id="show-how">HOW TO PLAY</button>
+        </div>
+        <div class="mode-toggle-corner">
+            <span class="mode-label">Pair Mode</span>
+            <label class="switch"><input type="checkbox" id="pair-switch"><span class="slider"></span></label>
+        </div>
+    </div>
+
+    <header id="control-pane">
+        <div class="header-side"><button class="icon-btn" id="home-btn">🏠</button></div>
+        <div class="header-title">EGG<span>ROULETTE</span></div>
+        <div class="header-side right"><button class="icon-btn" id="restart-btn">↻</button></div>
+    </header>
+
+    <div id="table-container"><div id="table"></div></div>
+
+    <div id="modal" class="modal-wrap">
+        <div class="modal-content">
+            <div id="modal-icon"></div>
+            <h2 id="modal-title"></h2>
+            <p id="modal-desc"></p>
+            <button class="primary-btn" id="modal-close">OK</button>
+            <button class="chicken-out" id="chicken-out-btn" style="display:none;">Wait, I'm chicken...</button>
+        </div>
+    </div>
+
+    <div id="how-modal" class="modal-wrap">
+        <div class="modal-content">
+            <div style="text-align: justify; line-height: 1.4; font-size: 0.95rem;">
+                <h2 style="text-align: center; margin-bottom: 15px;">HOW TO PLAY 🍺</h2>
+                <p><b>The Stake:</b> Decide the penalty for the person who wakes the birds.</p>
+                <p><b>The Play:</b> Tap any card. Whole eggs (🥚) are safe. Pass the phone or keep going at your own risk!</p>
+                <p><b>The Trap:</b> If a chick hatches (🐣), perform the penalty. If the Hen (🐓) appears, the penalty is doubled!</p>
+            </div>
+            <button class="primary-btn" id="close-how">GOT IT!</button>
+        </div>
+    </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let traps = [], birdsFound = [], isGameOver = false, selectedSize = 16, isPairMode = false, confettiFrame = null;
+    const get = (id) => document.getElementById(id);
+
+    get('pair-switch').onchange = (e) => {
+        if(e.target.checked) {
+            isPairMode = true;
+            document.body.classList.add('pair-active');
+            get('modal-icon').innerText = '🐣+🐣';
+            get('modal-title').innerText = 'PAIR MODE ACTIVE';
+            get('modal-desc').innerText = 'Two birds are now hidden in the nest. The round only ends once both are found. Good luck!';
+            get('modal-close').innerText = "LET'S ROOST";
+            get('chicken-out-btn').style.display = 'block';
+            get('modal').style.display = 'block';
+            
+            get('modal-close').onclick = () => { get('modal').style.display = 'none'; get('chicken-out-btn').style.display = 'none'; };
+            get('chicken-out-btn').onclick = () => { 
+                isPairMode = false; get('pair-switch').checked = false;
+                document.body.classList.remove('pair-active');
+                get('modal').style.display = 'none'; get('chicken-out-btn').style.display = 'none';
+            };
+        } else {
+            isPairMode = false;
+            document.body.classList.remove('pair-active');
+        }
+    };
+
+    document.querySelectorAll('.grid-opt').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.grid-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedSize = parseInt(btn.dataset.size);
+        };
+    });
+
+    function initGame() {
+        stopConfetti(); isGameOver = false; birdsFound = []; traps = [];
+        while(traps.length < (isPairMode ? 2 : 1)) {
+            let r = Math.floor(Math.random() * selectedSize);
+            if(!traps.some(t => t.idx === r)) traps.push({ idx: r, type: Math.random() < 0.02 ? 'Hen' : 'Chick' });
+        }
+        const t = get('table'); t.innerHTML = '';
+        t.style.gridTemplateRows = `repeat(${selectedSize / 4}, 1fr)`;
+        for (let i = 0; i < selectedSize; i++) {
+            const egg = document.createElement('div'); egg.className = 'egg';
+            egg.innerHTML = `<div class="egg-inner" id="egg-${i}"><div class="egg-face cup-back"></div><div class="egg-face egg-front" id="face-${i}"></div></div>`;
+            egg.onclick = () => reveal(i); t.appendChild(egg);
+        }
+    }
+
+    function reveal(index) {
+        if (isGameOver) return;
+        const el = get(`egg-${index}`), face = get(`face-${index}`);
+        if (el.parentElement.classList.contains('flipped')) return;
+        el.parentElement.classList.add('flipped');
+        let trap = traps.find(t => t.idx === index);
+        if (trap) {
+            birdsFound.push(trap);
+            face.innerText = trap.type === 'Hen' ? '🐓' : '🐣';
+            face.classList.add('bad');
+            if (!isPairMode || birdsFound.length === 2) {
+                isGameOver = true; startConfetti(); setTimeout(() => showFinalPopup(), 500);
+            } else {
+                isGameOver = true; setTimeout(() => showFirstTrapPopup(trap.type), 500);
+            }
+        } else { face.innerText = '🥚'; }
+    }
+
+    function showFirstTrapPopup(type) {
+        setPopup(type === 'Hen' ? '🐓' : '🐣', 'FIRST TRAP FOUND', `You hit a ${type}! One bird is still hiding in the nest. The hunt continues...`, "OK");
+        get('modal-close').onclick = () => { get('modal').style.display = 'none'; isGameOver = false; };
+    }
+
+    function showFinalPopup() {
+        const hens = birdsFound.filter(b => b.type === 'Hen').length;
+        let title, desc, icon = birdsFound.length > 1 ? '🐥🐥' : (hens ? '🐓' : '🐣');
+        if (!isPairMode) {
+            if (hens) { title = 'DOUBLE PENALTY'; desc = 'CLUCK CLUCK! You woke the Mother Hen. This is a DOUBLE PENALTY! No mercy—twice the drinks and let out a loud cock-a-doodle-doo!'; }
+            else { title = 'THE HATCHLING'; desc = 'Chirp Chirp! You broke the shell. The chick is out, and it is time for you to drink.'; }
+        } else {
+            if (hens === 2) { title = 'HEN-POCALYPSE'; icon = '🐓🐓'; desc = 'TWO MOTHER HENS! This is absolute chaos. Perform an extreme penalty of the table\'s choice!'; }
+            else if (hens === 1) { icon = '🐣🐓'; title = 'DOUBLE PENALTY'; desc = 'You\'ve disturbed the whole nest. One chick, one Hen, and a double-sized drink for the unlucky finders!'; }
+            else { title = 'THE DUO'; desc = 'Double trouble! Two hatchlings means both of you are drinking. Hope you\'re thirsty.'; }
+        }
+        setPopup(icon, title, desc, "START AGAIN");
+        get('modal-close').onclick = () => { get('modal').style.display = 'none'; initGame(); };
+    }
+
+    function setPopup(icon, title, desc, btnText) {
+        get('modal-icon').innerText = icon; get('modal-title').innerText = title;
+        get('modal-desc').innerText = desc; get('modal-close').innerText = btnText;
+        get('modal').style.display = 'block';
+    }
+
+    function startConfetti() {
+        const c = get('confetti-canvas'), ctx = c.getContext('2d');
+        c.style.opacity = '1'; c.width = window.innerWidth; c.height = window.innerHeight;
+        let p = Array.from({length: 80}, () => ({ x: Math.random() * c.width, y: -10, r: Math.random() * 6 + 2, v: Math.random() * 2 + 3, c: `hsl(${Math.random() * 360}, 80%, 50%)` }));
+        function anim() { ctx.clearRect(0,0,c.width, c.height); p.forEach(p => { p.y += p.v; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, p.r, p.r); if(p.y > c.height) p.y = -10; }); confettiFrame = requestAnimationFrame(anim); }
+        anim();
+    }
+
+    function stopConfetti() { if(confettiFrame) cancelAnimationFrame(confettiFrame); const c = get('confetti-canvas'), ctx = c.getContext('2d'); ctx.clearRect(0, 0, c.width, c.height); c.style.opacity = '0'; }
+
+    get('start-game').onclick = () => { get('overlay').style.display = 'none'; initGame(); };
+    get('show-how').onclick = () => get('how-modal').style.display = 'block';
+    get('close-how').onclick = () => get('how-modal').style.display = 'none';
+    get('home-btn').onclick = () => location.reload();
+    get('restart-btn').onclick = () => { if(confirm("Reset the eggs?")) initGame(); };
+});
+</script>
+</body>
+</html>
