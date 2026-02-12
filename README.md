@@ -1,38 +1,28 @@
-# 🍺 Rapid King's Cup
+# 🍸 The Watering Hole
+**A Boutique Suite of Premium Digital Bar Games.**
 
-**Rapid King's Cup** is a sleek, mobile-optimized adaptation of the classic social drinking game. Designed for speed, it uses a **24-card "Power Deck"** to ensure the action never stalls.
+Welcome to **The Watering Hole**, a collection of handcrafted, high-stakes social games designed specifically for mobile browsers in bar and social environments. 
 
----
+## 🕹️ The Collection
 
-## 🎮 The Rules
+### 🃏 Rapid King's Cup
+The classic "Circle of Death" card game, optimized for fast-paced bar environments.
+* **Rapid-Fire UI:** Optimized for quick turnovers.
+* **Joker Mode:** High-risk mechanics.
 
-| Card | Title | Description |
-| :--- | :--- | :--- |
-| **Ace** | **THE ROYAL TOAST** | The crown commands a drink! Take a sip and carry on. 🥂 |
-| **9** | **THE THIEF** | Yoink! Steal a Shield (Queen) from any player. 🥷 |
-| **10** | **THE ASSASSIN** | Pick a target. They drink. You stay hydrated. 🎯 |
-| **Jack** | **THE HERO** | A total U-turn! You saved the next person. Reverse turn order! ↪️ |
-| **Queen** | **THE SHIELD** | Activate **before you draw** on a future turn to skip your go. 🛡️ |
-| **King (1-3)** | **KING'S TAX** | Pour a portion of your drink into the Center Cup. 🍷 |
-| **4th King** | **THE FINAL BOSS** | Drink the entire Center Cup! Game Over. 👑 |
+### 🥚 Egg Roulette
+A high-stakes game of chance. One nest, one hidden trap.
+* **Normal Mode:** Find the Hatchling (🐣) to trigger the penalty.
+* **Pair Mode:** Double the birds, double the danger.
+* **Rare Events:** Watch out for the **Mother Hen** (🐓) — a 2% "Double Penalty" event.
 
----
+## 🚀 Quick Start
+Play the live suite here:
+**[PASTE YOUR LIVE GITHUB PAGES LINK HERE]**
 
-## 🚀 Mobile Installation (PWA)
-
-This app is built as a **Progressive Web App**. To play without the browser address bar:
-
-1.  Open the link in **Chrome** (Android) or **Safari** (iOS).
-2.  Tap the **Menu** (three dots) or **Share** icon.
-3.  Select **"Add to Home Screen."**
-4.  Launch from your home screen for a full-screen, native app experience.
+## ⚖️ Disclaimer
+The games featured here are digital adaptations of existing social classics. There is no intention to infringe upon any copyrights. These projects are created solely for fun and games. 
 
 ---
-
-## 🛠️ Technical Features
-
-* **PWA Ready:** Manifest and meta-tags included for standalone mobile play.
-* **Viewport Lock:** Uses `inset: 0` and `fixed` positioning to banish the "white box" mobile bug.
-* **Smooth UI:** CSS3 3D-card flips and a custom JS confetti engine.
-* **Control Pane:** Persistent header with Pause and Restart functions.
-* 
+**ALL CODE HANDCRAFTED BY GEMINI (AI COLLABORATOR).**
+**EST. 2026 | Handcrafted for Chaos.**
