@@ -58,21 +58,6 @@
         .game-name { font-size: 1.2rem; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
         .game-desc { font-size: 0.85rem; color: var(--sub-text); margin: 5px 0 0; line-height: 1.4; }
 
-        .tag {
-            position: absolute; top: 12px; right: 12px;
-            font-size: 0.6rem; font-weight: 900; padding: 4px 8px;
-            border-radius: 5px; background: rgba(255,255,255,0.1); text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .game-card.disabled { 
-            opacity: 0.6; 
-            filter: grayscale(0.8); 
-            pointer-events: none; 
-            border-style: dashed; 
-            background: rgba(255,255,255,0.02); 
-        }
-
         .disclaimer-box {
             margin-top: 50px;
             max-width: 400px;
@@ -88,7 +73,7 @@
             font-style: italic;
         }
 
-        footer { margin-top: 20px; padding-bottom: 20px; font-size: 0.7rem; opacity: 0.4; letter-spacing: 2px; text-transform: uppercase; }
+        footer { margin-top: 20px; padding-bottom: 20px; font-size: 0.7rem; opacity: 0.4; letter-spacing: 2px; text-transform: uppercase; text-align: center; }
     </style>
 </head>
 <body>
@@ -117,25 +102,23 @@
             </div>
         </a>
 
-        <div class="game-card disabled">
+        <a href="blowing-cow.html" class="game-card">
             <div class="game-icon">🐮</div>
             <div class="game-info">
                 <h2 class="game-name">Blowing Cow</h2>
-                <p class="game-desc">The next addition to the pasture. Keep your eyes on the dice.</p>
+                <p class="game-desc">Premium digital dice cup. Shake, peek, and blow for luck.</p>
             </div>
-            <div class="tag">Coming Soon</div>
-        </div>
+        </a>
     </div>
 
     <div class="disclaimer-box">
         <p class="disclaimer-text">
             Disclaimer: The games featured here are digital adaptations of existing social classics. 
-            There is no intention to infringe upon any copyrights. These projects are created 
-            solely for fun and games.
+            There is no intention to infringe upon any copyrights. Handcrafted by Gemini.
         </p>
     </div>
 
-    <footer>EST. 2026</footer>
+    <footer>EST. 2026 • ALL CODE BY GEMINI</footer>
 </div>
 
 </body>
