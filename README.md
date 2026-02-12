@@ -18,7 +18,7 @@ A high-stakes game of chance. One nest, one hidden trap.
 
 ## 🚀 Quick Start
 Play the live suite here:
-**[PASTE YOUR LIVE GITHUB PAGES LINK HERE]**
+https://josephleejx.github.io/watering-hole/
 
 ## ⚖️ Disclaimer
 The games featured here are digital adaptations of existing social classics. There is no intention to infringe upon any copyrights. These projects are created solely for fun and games. 
