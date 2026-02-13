@@ -3,60 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Waterhole</title>
+    <title>The WateringHole</title>
     <style>
         :root {
-            --bg: #071a13; --accent: #00d2ff; --text: #ffffff;
-            --header-bg: #030d09; --header-h: 64px;
-            --card-bg: rgba(255,255,255,0.05);
-            --overlay-bg: linear-gradient(135deg, #071a13 0%, #1b4d3e 100%);
+            /* Vintage Boutique Palette */
+            --bg: #0d0b1e; 
+            --accent: #f1c40f; 
+            --text: #ffffff;
+            --muted: #a29bfe;
+            --card-bg: #1b1635;
         }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
-        
-        /* Standardized 64px Header */
-        #control-pane { height: var(--header-h); width: 100%; background: var(--header-bg); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .header-title { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; text-align: center; flex: 1; letter-spacing: 2px; }
-        .header-title span { color: var(--accent); display: block; font-size: 0.9rem; margin-top: -2px; }
-        .icon-btn { background: rgba(255,255,255,0.08); border: none; width: 40px; height: 40px; border-radius: 10px; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
+
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background-color: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            overflow-x: hidden; 
+        }
+
+        /* Branding Section */
+        .branding { text-align: center; padding: 60px 20px 30px; }
+        .sub-brand { font-size: 0.8rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 8px; }
+        .main-brand { font-size: 3.5rem; font-weight: 900; line-height: 0.9; margin-bottom: 12px; letter-spacing: -1px; }
+        .main-brand span { color: var(--accent); }
+        .tagline { font-size: 1.1rem; color: var(--muted); font-weight: 500; }
 
         /* Portal Layout */
-        .portal-container { padding: 20px; display: flex; flex-direction: column; gap: 20px; max-width: 500px; margin: 0 auto; }
+        .portal-container { padding: 20px; display: flex; flex-direction: column; gap: 15px; max-width: 450px; margin: 0 auto; padding-bottom: 80px; }
         
-        /* Boutique Cards */
-        .game-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; text-decoration: none; color: white; transition: 0.2s; position: relative; overflow: hidden; }
-        .game-card:active { transform: scale(0.98); background: rgba(255,255,255,0.1); }
-        .game-card h2 { margin: 0; font-size: 1.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; }
-        .game-card h2 span { color: var(--accent); }
-        .game-card p { margin: 10px 0 0 0; font-size: 0.9rem; line-height: 1.4; opacity: 0.8; font-weight: 500; }
+        .game-card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 25px; 
+            display: flex; align-items: center; gap: 20px; 
+            text-decoration: none; color: white; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .game-card:active { transform: scale(0.96); opacity: 0.9; }
+        
+        .card-icon { font-size: 2.5rem; width: 60px; text-align: center; }
+        .card-content { flex: 1; }
+        
+        .card-content h2 { margin: 0; font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card-content h2 span { color: var(--muted); }
+        .card-content p { margin: 8px 0 0 0; font-size: 0.9rem; line-height: 1.4; color: var(--muted); font-weight: 500; }
 
-        /* Feature Badge */
-        .badge { position: absolute; top: 15px; right: 15px; background: var(--accent); color: #071a13; font-size: 0.6rem; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        hr { border: none; border-bottom: 1px solid rgba(255,255,255,0.05); margin: 20px 40px; }
     </style>
 </head>
 <body>
 
-    <header id="control-pane">
-        <div class="header-side"></div>
-        <div class="header-title">THE<span>WATERHOLE</span></div>
-        <div class="header-side"></div>
-    </header>
+    <div class="branding">
+        <div class="sub-brand">The Boutique</div>
+        <div class="main-brand">Watering<span>Hole</span></div>
+        <div class="tagline">Premium digital bar games.</div>
+    </div>
 
     <div class="portal-container">
         
-        <a href="on-the-rocks.html" class="game-card">
-            <div class="badge">NEW</div>
-            <h2>ON THE<span>ROCKS</span></h2>
-            <p>Chilled rocks, simple rolls. Shake the cup and see what you land.</p>
-        </a>
-
         <a href="kings-cup.html" class="game-card">
-            <h2>RAPID<span>KING'S CUP</span></h2>
-            <p>The classic circle of death, optimized for fast-paced bar environments.</p>
+            <div class="card-icon">🃏</div>
+            <div class="card-content">
+                <h2>RAPID<span> KING'S CUP</span></h2>
+                <p>The classic circle of death, optimized for fast-paced bar environments.</p>
+            </div>
         </a>
 
         <a href="egg-roulette.html" class="game-card">
-            <h2>EGG<span>ROULETTE</span></h2>
-            <p>High-stakes tension. Stay away from the hatchlings or pay the price.</p>
+            <div class="card-icon">🥚</div>
+            <div class="card-content">
+                <h2>EGG<span> ROULETTE</span></h2>
+                <p>High-stakes tension. Stay away from the hatchlings or pay the price.</p>
+            </div>
+        </a>
+
+        <a href="on-the-rocks.html" class="game-card">
+            <div class="card-icon">🎲</div>
+            <div class="card-content">
+                <h2>ON THE<span> ROCKS</span></h2>
+                <p>Chilled rocks, simple rolls. Shake the cup and see what you land.</p>
+            </div>
         </a>
 
     </div>
