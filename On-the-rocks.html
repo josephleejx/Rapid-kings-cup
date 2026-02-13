@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>On the Rocks</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+    <style>
+        :root {
+            --bg: #071a13; --accent: #00d2ff; --text: #ffffff;
+            --header-bg: #030d09; --header-h: 64px; --cup-color: #1b4d3e;
+            --overlay-bg: linear-gradient(135deg, #071a13 0%, #1b4d3e 100%);
+            --die-red: #e74c3c;
+            --void-bg: rgba(0, 0, 0, 0.5);
+        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; touch-action: none; }
+        
+        #main-wrapper { display: flex; flex-direction: column; width: 100%; height: 100%; position: relative; justify-content: space-between; }
+
+        /* Slim Standard Header */
+        #control-pane { height: var(--header-h); width: 100%; background: var(--header-bg); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; box-sizing: border-box; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .header-title { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; text-align: center; flex: 1; letter-spacing: 1px; }
+        .header-title span { color: var(--accent); display: block; font-size: 0.9rem; margin-top: -2px; }
+        .icon-btn { background: rgba(255,255,255,0.08); border: none; width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer; }
+
+        /* Gameplay Container - 5% Elevation */
+        #game-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; transform: translateY(-5%); }
+        .game-stage { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* Guidance Spacing */
+        #guide-prompt { height: 20px; margin-bottom: 30px; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); opacity: 0; pointer-events: none; z-index: 20; }
+        .blink-sequence { animation: blinkVanish 3.5s forwards; }
+        @keyframes blinkVanish { 0%, 20%, 40%, 60% { opacity: 1; } 10%, 30%, 50%, 70% { opacity: 0.2; } 100% { opacity: 0; visibility: hidden; } }
+
+        #dice-void {
+            position: absolute; width: 280px; height: 280px;
+            background: var(--void-bg); border-radius: 50%;
+            box-shadow: inset 0 12px 35px rgba(0,0,0,0.8);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s; z-index: 1; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+
+        /* Large 216x288 Cup */
+        #cup-wrapper { position: relative; width: 216px; height: 288px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; z-index: 10; }
+        .cup { width: 100%; height: 100%; background: var(--cup-color); border-radius: 50px 50px 20px 20px; border: 3px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+
+        /* Dice Spacing */
+        #dice-tray { position: relative; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; z-index: 2; width: 220px; }
+        .die { width: 50px; height: 50px; background: white; border-radius: 10px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 5px; box-sizing: border-box; box-shadow: 0 4px 0 #dfe6e9; }
+        .pip { background: #2d3436; border-radius: 50%; width: 80%; height: 80%; margin: auto; visibility: hidden; }
+        .die[data-val="1"] .p5 { visibility: visible; background: var(--die-red); transform: scale(1.3); }
+        .die[data-val="2"] .p3, .die[data-val="2"] .p7 { visibility: visible; }
+        .die[data-val="3"] .p1, .die[data-val="3"] .p5, .die[data-val="3"] .p9 { visibility: visible; }
+        .die[data-val="4"] .p1, .die[data-val="4"] .p3, .die[data-val="4"] .p7, .die[data-val="4"] .p9 { visibility: visible; }
+        .die[data-val="5"] .p1, .die[data-val="5"] .p3, .die[data-val="5"] .p5, .die[data-val="5"] .p7, .die[data-val="5"] .p9 { visibility: visible; }
+        .die[data-val="6"] .p1, .die[data-val="6"] .p3, .die[data-val="6"] .p4, .die[data-val="6"] .p6, .die[data-val="6"] .p7, .die[data-val="6"] .p9 { visibility: visible; }
+        .tray-3 { width: 120px !important; } 
+
+        #cup-wrapper.lifting, #cup-wrapper.revealed { transform: translateY(-330px) rotate(-10deg); }
+        .void-visible { opacity: 1 !important; }
+        @keyframes rattle { 0% { transform: translate(0, 0); } 25% { transform: translate(10px, -6px); } 50% { transform: translate(-10px, 6px); } 100% { transform: translate(0, 0); } }
+        .shaking { animation: rattle 0.08s infinite; }
+
+        /* Stable Controls */
+        .controls { padding: 20px 20px 40px 20px; display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box; align-items: center; position: relative; }
+        .action-btn { width: 100%; max-width: 280px; padding: 18px 0; border-radius: 50px; border: none; font-weight: 900; font-size: 1rem; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .peek-btn { background: var(--accent); color: #071a13; -webkit-user-select: none; }
+        .secondary-btn { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.2); font-size: 0.85rem; }
+
+        /* Post-Reveal Positioning */
+        #new-round-btn { transform: translateY(-80px); }
+
+        /* Home Page */
+        #overlay { position: fixed; inset: 0; background: var(--overlay-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; padding: 20px; text-align: center; }
+        .game-title-large { font-size: 4.8rem; font-weight: 900; text-transform: uppercase; line-height: 0.85; margin-bottom: 25px; letter-spacing: -2px; }
+        .game-title-large span { color: var(--accent); display: block; }
+        .grid-select-wrap { margin: 20px 0; width: 220px; }
+        .grid-select-label { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: block; letter-spacing: 1px; }
+        .grid-options { display: flex; justify-content: space-between; gap: 10px; }
+        .grid-opt { flex: 1; padding: 12px 0; background: rgba(255,255,255,0.1); border: 2px solid transparent; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .grid-opt.active { border-color: var(--accent); color: var(--accent); background: rgba(0,0,0,0.2); }
+
+        /* Centered Instructions Modal */
+        #how-to-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; display: none; flex-direction: column; padding: 40px 30px; justify-content: center; align-items: center; }
+        .modal-title { color: var(--accent); font-size: 2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 30px; }
+        .rules-list { color: white; text-align: left; line-height: 1.6; font-size: 1.1rem; list-style: none; padding: 0; max-width: 320px; }
+        .rules-list li { margin-bottom: 15px; display: flex; gap: 15px; }
+        .rules-list li span { color: var(--accent); font-weight: 900; }
+        .close-modal { margin-top: 40px; }
+    </style>
+</head>
+<body>
+<div id="main-wrapper">
+    <div id="overlay">
+        <div class="game-title-large">ON THE<br><span>ROCKS</span></div>
+        <div class="grid-select-wrap">
+            <span class="grid-select-label">Select Number of Dice</span>
+            <div class="grid-options">
+                <button class="grid-opt" data-val="1">1</button>
+                <button class="grid-opt" data-val="3">3</button>
+                <button class="grid-opt active" data-val="5">5</button>
+            </div>
+        </div>
+        <div class="controls" style="transform:none;">
+            <button class="action-btn peek-btn" id="start-game">START GAME</button>
+            <button class="action-btn secondary-btn" onclick="toggleRules(true)">HOW TO PLAY</button>
+        </div>
+    </div>
+
+    <div id="how-to-modal">
+        <div class="modal-title">How To Play</div>
+        <ul class="rules-list">
+            <li><span>1</span> Select your number of dice and Start.</li>
+            <li><span>2</span> Tap the cup to shake the rocks.</li>
+            <li><span>3</span> Hold PEEK to check your roll secretly.</li>
+            <li><span>4</span> Press REVEAL to show the full table.</li>
+        </ul>
+        <button class="action-btn peek-btn close-modal" onclick="toggleRules(false)">GOT IT</button>
+    </div>
+
+    <header id="control-pane">
+        <div class="header-side"><button class="icon-btn" onclick="location.href='index.html'">🏠</button></div>
+        <div class="header-title">ON THE<span>ROCKS</span></div>
+        <div class="header-side right"><button class="icon-btn" onclick="resetRound()">↻</button></div>
+    </header>
+
+    <div id="game-container">
+        <div class="game-stage">
+            <div id="guide-prompt">Tap cup to shake</div>
+            <div id="dice-void"><div id="dice-tray"></div></div>
+            <div id="cup-wrapper" onclick="shakeCup()"><div class="cup"></div></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="action-btn peek-btn" id="peek-trigger">HOLD TO PEEK</button>
+        <button class="action-btn secondary-btn" id="reveal-btn" onclick="revealCup()">PRESS TO REVEAL</button>
+        <button class="action-btn peek-btn" id="new-round-btn" style="display:none;" onclick="resetRound()">NEW ROUND</button>
+    </div>
+</div>
+
+<script>
+    const cup = document.getElementById('cup-wrapper');
+    const voidEl = document.getElementById('dice-void');
+    const tray = document.getElementById('dice-tray');
+    const peekBtn = document.getElementById('peek-trigger');
+    const revealBtn = document.getElementById('reveal-btn');
+    const newRoundBtn = document.getElementById('new-round-btn');
+    const guide = document.getElementById('guide-prompt');
+    const modal = document.getElementById('how-to-modal');
+    let isShaking = false, hasRolled = false, diceCount = 5, guideSeen = false;
+
+    function toggleRules(show) { modal.style.display = show ? 'flex' : 'none'; }
+
+    document.querySelectorAll('.grid-opt').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.grid-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            diceCount = parseInt(btn.dataset.val);
+        }
+    });
+
+    function shakeCup() {
+        if (isShaking) return;
+        isShaking = true; hasRolled = false;
+        cup.classList.remove('revealed', 'lifting');
+        voidEl.classList.remove('void-visible');
+        peekBtn.style.display = 'block'; revealBtn.style.display = 'block'; newRoundBtn.style.display = 'none';
+        guide.classList.remove('blink-sequence'); guide.style.opacity = '0';
+        cup.classList.add('shaking');
+        
+        setTimeout(() => {
+            tray.innerHTML = '';
+            if (diceCount === 3) tray.classList.add('tray-3'); else tray.classList.remove('tray-3');
+            for(let i=0; i<diceCount; i++) {
+                const val = Math.floor(Math.random() * 6) + 1;
+                const die = document.createElement('div');
+                die.className = 'die'; die.dataset.val = val;
+                for(let p=1; p<=9; p++) die.innerHTML += `<div class="pip p${p}"></div>`;
+                tray.appendChild(die);
+            }
+            cup.classList.remove('shaking'); isShaking = false; hasRolled = true;
+            if (!guideSeen) { guide.classList.add('blink-sequence'); guideSeen = true; }
+        }, 1500);
+    }
+
+    function startPeek(e) { if (hasRolled && !isShaking) { e.preventDefault(); cup.classList.add('lifting'); voidEl.classList.add('void-visible'); } }
+    function endPeek() { if(!cup.classList.contains('revealed')) { cup.classList.remove('lifting'); voidEl.classList.remove('void-visible'); } }
+    function revealCup() { if (hasRolled && !isShaking) { cup.classList.add('revealed'); voidEl.classList.add('void-visible'); peekBtn.style.display = 'none'; revealBtn.style.display = 'none'; newRoundBtn.style.display = 'block'; } }
+    function resetRound() { if(confirm("Start a new round?")) shakeCup(); }
+
+    peekBtn.addEventListener('touchstart', startPeek); peekBtn.addEventListener('touchend', endPeek);
+    peekBtn.addEventListener('mousedown', startPeek); peekBtn.addEventListener('mouseup', endPeek);
+    document.getElementById('start-game').onclick = () => { document.getElementById('overlay').style.display = 'none'; shakeCup(); };
+</script>
+</body>
+</html>
